@@ -154,6 +154,39 @@ int main(void) {
     printf("Test 11 passed: All page faults\n");
 
 
+    // Test 12: Belady's Anomaly in FIFO.
+    // Increasing the number of frames may increase page faults.
+    int pages12[] = {1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5};
+
+    Statistics fifo12_3 = run_fifo(pages12, 12, 3);
+    Statistics fifo12_4 = run_fifo(pages12, 12, 4);
+
+    // Verify the expected statistics.
+    check_results(fifo12_3, 3, 9, 6);
+    check_results(fifo12_4, 2, 10, 6);
+
+    // Confirm Belady's Anomaly.
+    assert(fifo12_4.faults > fifo12_3.faults);
+
+    printf("Test 12 passed: Belady's Anomaly\n");
+    printf("  FIFO with 3 frames: %d faults\n", fifo12_3.faults);
+    printf("  FIFO with 4 frames: %d faults\n", fifo12_4.faults);
+
+    // Test 13: LRU with increasing frame counts.
+    // Use the same reference sequence for a fair comparison.
+    Statistics lru13_3 = run_lru(pages12, 12, 3);
+    Statistics lru13_4 = run_lru(pages12, 12, 4);
+
+    // Verify the expected statistics.
+    check_results(lru13_3, 2, 10, 7);
+    check_results(lru13_4, 4, 8, 4);
+
+    // Verify that increasing frames does not increase faults.
+    assert(lru13_4.faults <= lru13_3.faults);
+
+    printf("Test 13 passed: LRU frame comparison\n");
+    printf("  LRU with 3 frames: %d faults\n", lru13_3.faults);
+    printf("  LRU with 4 frames: %d faults\n", lru13_4.faults);
 
     // All tests completed without assertion failures.
     printf("\nAll FIFO and LRU tests passed!\n");
