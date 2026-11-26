@@ -117,6 +117,44 @@ int main(void) {
     printf("Test 8 passed: Negative frame count\n");
 
 
+    // Test 9: Locality of reference.
+    // Frequently accessed pages with sufficient frames.
+    int pages9[] = {1, 2, 1, 2, 1, 2, 3, 1, 2};
+
+    Statistics fifo9 = run_fifo(pages9, 9, 3);
+    Statistics lru9 = run_lru(pages9, 9, 3);
+
+    check_results(fifo9, 6, 3, 0);
+    check_results(lru9, 6, 3, 0);
+
+    printf("Test 9 passed: Locality of reference\n");
+
+    // Test 10: Memory pressure.
+    // Three different pages competing for two frames.
+    int pages10[] = {1, 2, 3, 1, 2, 3};
+
+    Statistics fifo10 = run_fifo(pages10, 6, 2);
+    Statistics lru10 = run_lru(pages10, 6, 2);
+
+    check_results(fifo10, 0, 6, 4);
+    check_results(lru10, 0, 6, 4);
+
+    printf("Test 10 passed: Memory pressure\n");
+
+    // Test 11: All page faults.
+    // Every requested page is different.
+    int pages11[] = {1, 2, 3, 4, 5, 6};
+
+    Statistics fifo11 = run_fifo(pages11, 6, 3);
+    Statistics lru11 = run_lru(pages11, 6, 3);
+
+    check_results(fifo11, 0, 6, 3);
+    check_results(lru11, 0, 6, 3);
+
+    printf("Test 11 passed: All page faults\n");
+
+
+
     // All tests completed without assertion failures.
     printf("\nAll FIFO and LRU tests passed!\n");
 
